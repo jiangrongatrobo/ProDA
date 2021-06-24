@@ -50,7 +50,7 @@ def label2rgb(func, label):
     return rgbs
 
 def validate(valid_loader, device, model, opt):
-    ori_LP = os.path.join(opt.root, 'Code/ProDA', opt.save_path, opt.name)
+    ori_LP = os.path.join(opt.root, '', opt.save_path, opt.name)
 
     if not os.path.exists(ori_LP):
         os.makedirs(ori_LP)

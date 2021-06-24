@@ -73,10 +73,10 @@ def parser_(parser):
 
 def relative_path_to_absolute_path(opt):
     opt.rcrop = [int(opt.rcrop.split(',')[0]), int(opt.rcrop.split(',')[1])]
-    opt.resume_path = os.path.join(opt.root, 'Code/ProDA', opt.resume_path)
+    opt.resume_path = os.path.join(opt.root, '', opt.resume_path)
     opt.src_rootpath = os.path.join(opt.root, opt.src_rootpath)
     opt.tgt_rootpath = os.path.join(opt.root, opt.tgt_rootpath)
-    opt.path_LP = os.path.join(opt.root, 'Code/ProDA', opt.path_LP)
-    opt.path_soft = os.path.join(opt.root, 'Code/ProDA', opt.path_soft)
-    opt.logdir = os.path.join(opt.root, 'Code/ProDA', 'logs', opt.name)
+    opt.path_LP = os.path.join(opt.root, '', opt.path_LP)
+    opt.path_soft = os.path.join(opt.root, '', opt.path_soft)
+    opt.logdir = os.path.join(opt.root, '', 'logs', opt.name)
     return opt

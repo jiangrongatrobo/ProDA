@@ -23,23 +23,24 @@ def train(opt, logger):
     torch.cuda.manual_seed(opt.seed)
     np.random.seed(opt.seed)
     random.seed(opt.seed)
-    ## create dataset
+    print("## create dataset")
     device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
     datasets = create_dataset(opt, logger)
 
     if opt.model_name == 'deeplabv2':
         model = adaptation_modelv2.CustomModel(opt, logger)
 
-    # Setup Metrics
+    print("# Setup Metrics")
     running_metrics_val = runningScore(opt.n_class)
     time_meter = averageMeter()
 
-    # load category anchors
+    
     if opt.stage == 'stage1':
+        print("# load category anchors")
         objective_vectors = torch.load(os.path.join(os.path.dirname(opt.resume_path), 'prototypes_on_{}_from_{}'.format(opt.tgt_dataset, opt.model_name)))
         model.objective_vectors = torch.Tensor(objective_vectors).to(0)
 
-    # begin training
+    print("# begin training")
     save_path = os.path.join(opt.logdir,"from_{}_to_{}_on_{}_current_model.pkl".format(opt.src_dataset, opt.tgt_dataset, opt.model_name))
     model.iter = 0
     start_epoch = 0
@@ -72,14 +73,16 @@ def train(opt, logger):
             if opt.stage == 'warm_up':
                 loss_GTA, loss_G, loss_D = model.step_adv(images, labels, target_image, source_imageS, source_params)
             elif opt.stage == 'stage1':
+                print('before step')
                 loss, loss_CTS, loss_consist = model.step(images, labels, target_image, target_imageS, target_params, target_lp,
                                         target_lpsoft, target_image_full, target_weak_params)
+                print('after step')
             else:
                 loss_GTA, loss = model.step_distillation(images, labels, target_image, target_imageS, target_params, target_lp)
 
             time_meter.update(time.time() - start_ts)
 
-            #print(i)
+            print(i)
             if (i + 1) % opt.print_interval == 0:
                 if opt.stage == 'warm_up':
                     fmt_str = "Epochs [{:d}/{:d}] Iter [{:d}/{:d}]  loss_GTA: {:.4f}  loss_G: {:.4f}  loss_D: {:.4f} Time/Image: {:.4f}"

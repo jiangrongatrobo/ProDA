@@ -90,7 +90,6 @@ if __name__ == "__main__":
         os.makedirs(opt.logdir)
 
     logger = get_logger(opt.logdir)
-
     test(opt, logger)
 
 

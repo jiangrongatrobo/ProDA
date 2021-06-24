@@ -47,7 +47,15 @@ python test.py --bn_clr --student_init simclr --resume ./pretrained/gta2citylabv
   
 Download the [pretrained model](https://drive.google.com/file/d/1oiGPe6c4WfYi-5pYaejOa6L4WA98Ds63/view?usp=sharing) (55.5 mIoU, 62.0 mIoU for 16, 13 categories respectively) and save it in `./pretrained/syn2citylabv2_stage3`. Then run the command 
 ```bash
-python test.py --bn_clr --student_init simclr --n_class 16 --resume ./pretrained/syn2citylabv2_stage3/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl
+python test.py \
+--bn_clr \
+--student_init simclr \
+--n_class 16 \
+--resume ./pretrained/syn2citylabv2_stage3/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl \
+--src_dataset synthia \
+--root ./ \
+--src_rootpath synthia/RAND_CITYSCAPES \
+--tgt_rootpath cityscapes
 ```
 </details>
 
@@ -103,15 +111,47 @@ To reproduce the performance, you need 4 GPUs with no less than 16G memory.
 - **Stage1.** Download [warmup model](https://drive.google.com/file/d/1RpjnA8ncHqR90LeWEHE4p9wSI251KLW_/view?usp=sharing)(41.4 mIoU), save it in `./pretrained/syn2citylabv2_warmup/`.
     * Generate soft pseudo label.
     ```bash
-    python generate_pseudo_label.py --name syn2citylabv2_warmup_soft --soft --n_class 16 --resume_path ./pretrained/syn2citylabv2_warmup/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl --no_droplast 
+    python generate_pseudo_label.py \
+    --name syn2citylabv2_warmup_soft \
+    --resume_path ./pretrained/syn2citylabv2_warmup/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl \
+    --soft \
+    --n_class 16 \
+    --no_droplast \
+    --src_dataset synthia \
+    --root ./ \
+    --src_rootpath synthia/RAND_CITYSCAPES \
+    --tgt_rootpath cityscapes
+
     ```
     * Calculate initial prototypes.
     ```bash
-    python calc_prototype.py --resume_path ./pretrained/syn2citylabv2_warmup/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl --n_class 16
+    python calc_prototype.py \
+    --resume_path ./pretrained/syn2citylabv2_warmup/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl \
+    --n_class 16 \
+    --src_dataset synthia \
+    --root ./ \
+    --src_rootpath synthia/RAND_CITYSCAPES \
+    --tgt_rootpath cityscapes
     ```
     * Train stage1.
     ```bash
-    python train.py --name syn2citylabv2_stage1Denoise --src_dataset synthia --n_class 16 --src_rootpath src_rootpath --used_save_pseudo --path_soft Pseudo/syn2citylabv2_warmup_soft --ema --proto_rectify --moving_prototype --proto_consistW 10 --resume_path ./pretrained/syn2citylabv2_warmup/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl --rce
+    python train.py \
+    --name syn2citylabv2_stage1Denoise \
+    --src_dataset synthia \
+    --n_class 16 \
+    --src_rootpath synthia/RAND_CITYSCAPES \
+    --used_save_pseudo \
+    --path_soft Pseudo/syn2citylabv2_warmup_soft \
+    --ema \
+    --proto_rectify \
+    --moving_prototype \
+    --proto_consistW 10 \
+    --resume_path ./pretrained/syn2citylabv2_warmup/from_synthia_to_cityscapes_on_deeplabv2_best_model.pkl \
+    --rce \
+    --root ./ \
+    --src_rootpath synthia/RAND_CITYSCAPES \
+    --bs 2 \
+    --tgt_rootpath cityscapes
     ```
 
 - **Stage2.** This stage needs well-trained model from stage1 as teacher model. You can get it by above command or download released pretrained [stage1 model](https://drive.google.com/file/d/180buGBRRnj5eNa0MW-GuKH6n5zS-eQSA/view?usp=sharing)(51.9 mIoU) and save it in `./pretrained/syn2citylabv2_stage1Denoise/` (path of `resume_path`).
